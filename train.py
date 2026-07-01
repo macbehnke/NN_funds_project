@@ -5,7 +5,7 @@ import time
 from pathlib import Path
 
 import torch
-from torch.optim import Adam
+from torch.optim import Adam, SGD
 from tqdm import tqdm
 
 from src.data import get_dataloaders
@@ -64,12 +64,45 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--metrics-path", type=Path, default=Path("outputs/metrics.json"), help="Where to save final metrics.")
     parser.add_argument("--epochs", type=int, default=8, help="Number of training epochs.")
     parser.add_argument("--batch-size", type=int, default=128, help="Mini-batch size.")
-    parser.add_argument("--lr", type=float, default=1e-3, help="Adam learning rate.")
+    parser.add_argument(
+        "--optimizer",
+        choices=["auto", "sgd", "adam"],
+        default="auto",
+        help="Optimizer. auto uses SGD for historical LeNet-5 and Adam for ResNet-18.",
+    )
+    parser.add_argument(
+        "--lr",
+        type=float,
+        default=None,
+        help="Learning rate. Defaults to 0.01 for SGD and 0.001 for Adam.",
+    )
     parser.add_argument("--val-size", type=int, default=5000, help="Validation examples split from training set.")
     parser.add_argument("--seed", type=int, default=42, help="Random seed.")
     parser.add_argument("--num-workers", type=int, default=0, help="DataLoader worker count. Use 0 on Windows.")
     parser.add_argument("--cpu", action="store_true", help="Force CPU even if CUDA is available.")
     return parser.parse_args()
+
+
+def resolve_optimizer_name(model_name: str, optimizer_name: str) -> str:
+    if optimizer_name != "auto":
+        return optimizer_name
+    if model_name == "lenet5":
+        return "sgd"
+    return "adam"
+
+
+def default_learning_rate(optimizer_name: str) -> float:
+    if optimizer_name == "sgd":
+        return 1e-2
+    return 1e-3
+
+
+def build_optimizer(model: torch.nn.Module, optimizer_name: str, learning_rate: float) -> torch.optim.Optimizer:
+    if optimizer_name == "sgd":
+        return SGD(model.parameters(), lr=learning_rate)
+    if optimizer_name == "adam":
+        return Adam(model.parameters(), lr=learning_rate)
+    raise ValueError(f"Unknown optimizer: {optimizer_name}")
 
 
 def serializable_args(args: argparse.Namespace) -> dict[str, str | int | float | bool | None]:
@@ -101,7 +134,9 @@ def main() -> None:
 
     model = build_model(args.model).to(device)
     criterion = build_loss(args.model)
-    optimizer = Adam(model.parameters(), lr=args.lr)
+    optimizer_name = resolve_optimizer_name(args.model, args.optimizer)
+    learning_rate = args.lr if args.lr is not None else default_learning_rate(optimizer_name)
+    optimizer = build_optimizer(model, optimizer_name, learning_rate)
 
     checkpoint_dir = ensure_dir(args.checkpoint_dir)
     best_checkpoint_path = checkpoint_dir / f"{args.model}_mnist_best.pt"
@@ -112,6 +147,7 @@ def main() -> None:
 
     print(f"Device: {device}")
     print(f"Trainable parameters: {count_parameters(model):,}")
+    print(f"Optimizer: {optimizer_name} lr={learning_rate}")
 
     for epoch in range(1, args.epochs + 1):
         train_loss, train_accuracy = run_epoch(model, args.model, train_loader, criterion, device, optimizer)
@@ -156,7 +192,8 @@ def main() -> None:
         "device": str(device),
         "epochs": args.epochs,
         "batch_size": args.batch_size,
-        "learning_rate": args.lr,
+        "optimizer": optimizer_name,
+        "learning_rate": learning_rate,
         "parameters": count_parameters(model),
         "best_val_accuracy": best_val_accuracy,
         "test_loss": test_loss,

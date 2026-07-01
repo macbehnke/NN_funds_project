@@ -38,7 +38,7 @@ Mention parameter count from final run.
 
 ## 6. Training Setup
 
-- Adam optimizer
+- Adam optimizer for the completed run; SGD prepared as the closer historical rerun
 - LeNet-5 MAP-style RBF penalty loss
 - batch size 128
 - 8 epochs

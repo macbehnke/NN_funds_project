@@ -29,7 +29,7 @@ These choices are the core of the historical architecture and make the model eas
 
 4. Optimizer
 
-   We used Adam with learning rate 0.001. The original paper used an older training setup. Adam gives stable convergence in a short class-project run.
+   The completed run used Adam with learning rate 0.001. The original paper did not use Adam, so the code now also supports a stricter `--optimizer sgd` run. Plain SGD is closer to the historical training setup, although it is still not an exact implementation of the paper's older per-parameter/second-order training procedure.
 
 5. Data augmentation
 

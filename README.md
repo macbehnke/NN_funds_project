@@ -17,6 +17,7 @@ Historical LeNet-5 final run:
 | Model | Historical LeNet-5 with RBF output |
 | Parameters | 60,000 |
 | Epochs | 20 |
+| Optimizer | Adam |
 | Device used | CPU |
 | Training time | 125.94 seconds |
 | Best validation accuracy | 98.64% |
@@ -110,10 +111,10 @@ CPU-only run:
 python train.py --cpu
 ```
 
-Cluster/GPU-friendly run:
+Cluster/GPU-friendly run with the closer historical optimizer:
 
 ```bash
-python train.py --epochs 8 --batch-size 128 --num-workers 2
+python train.py --model lenet5 --optimizer sgd --lr 0.01 --epochs 20 --batch-size 128 --num-workers 2
 ```
 
 Training saves:
@@ -135,9 +136,11 @@ The default `lenet5` model is now the historical reproduction:
 Run:
 
 ```bash
-python train.py --model lenet5 --epochs 20 --batch-size 128 --num-workers 2 --metrics-path outputs/metrics.json
+python train.py --model lenet5 --optimizer sgd --lr 0.01 --epochs 20 --batch-size 128 --num-workers 2 --metrics-path outputs/metrics.json
 python evaluate.py --model lenet5 --checkpoint checkpoints/lenet5_mnist_best.pt --num-workers 2 --output outputs/evaluation.json
 ```
+
+The original LeNet-5 paper did not use Adam. In this PyTorch reproduction, `--optimizer sgd` is the closer historical choice because it uses plain stochastic gradient descent. The exact 1998 training recipe used older per-parameter/second-order ideas that are not provided as a standard PyTorch optimizer, so this project treats SGD as the historically closer run and Adam as the stable modern optimizer used for the first completed result.
 
 ## Evaluate
 
@@ -229,7 +232,15 @@ Draw a digit in the browser and click `Classify`. The app sends the canvas image
 
 ## Reproduce final result
 
-The committed final run produced `outputs/metrics.json`, `outputs/evaluation.json`, figures in `outputs/`, and `checkpoints/lenet5_mnist_best.pt`. Re-running training should normally produce a result around 98-99% test accuracy, though exact values can differ slightly by environment.
+The committed final run produced `outputs/metrics.json`, `outputs/evaluation.json`, figures in `outputs/`, and `checkpoints/lenet5_mnist_best.pt`. That run used Adam. For the stricter historical optimizer run, use:
+
+```bash
+python train.py --model lenet5 --optimizer sgd --lr 0.01 --epochs 20 --batch-size 128 --num-workers 2
+python evaluate.py --model lenet5 --checkpoint checkpoints/lenet5_mnist_best.pt --num-workers 2 --output outputs/evaluation.json
+python make_figures.py --num-workers 2
+```
+
+Re-running training should normally produce a result around 98-99% test accuracy, though exact values can differ slightly by environment.
 
 ## Reproducibility
 

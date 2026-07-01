@@ -64,7 +64,7 @@ The implemented `lenet5` model follows the historical LeNet-5 architecture:
 
 Default configuration:
 
-- optimizer: Adam
+- optimizer: Adam for the completed run; SGD is prepared for the stricter historical rerun
 - learning rate: 0.001
 - loss: LeNet-5 MAP-style RBF penalty loss
 - batch size: 128
@@ -177,13 +177,13 @@ What we changed:
 - We pad 28x28 MNIST images to 32x32 as in the historical architecture.
 - We reproduce the partial C3 feature-map connectivity.
 - We use fixed Euclidean RBF output units instead of a modern linear classifier.
-- We trained with Adam instead of the original older optimization setup.
+- The completed run used Adam instead of the original older optimization setup.
 - We did not use distortion-based data augmentation.
 
 Why these changes are reasonable:
 
 - The historical RBF output gives a closer reproduction than the modern softmax classifier.
-- Adam gives stable convergence while preserving the historical architecture and output formulation.
+- Adam gives stable convergence while preserving the historical architecture and output formulation; the code also supports SGD for a stricter historical optimizer rerun.
 - Avoiding augmentation keeps the experiment focused on the baseline architecture.
 
 Why these changes matter:
