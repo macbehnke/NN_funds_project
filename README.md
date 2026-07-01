@@ -16,14 +16,14 @@ Historical LeNet-5 final run:
 |---|---:|
 | Model | Historical LeNet-5 with RBF output |
 | Parameters | 60,000 |
-| Epochs | TODO after cluster run |
-| Device used | TODO after cluster run |
-| Training time | TODO after cluster run |
-| Best validation accuracy | TODO after cluster run |
-| Test accuracy | TODO after cluster run |
-| Test error | TODO after cluster run |
+| Epochs | 20 |
+| Device used | CPU |
+| Training time | 125.94 seconds |
+| Best validation accuracy | 98.64% |
+| Test accuracy | 98.87% |
+| Test error | 1.13% |
 
-LeCun et al. reported about 0.8-0.95% test error for LeNet-5 on MNIST depending on the specific run and training setting. The historical model must be rerun after this architecture update before reporting the final comparison.
+LeCun et al. reported about 0.8-0.95% test error for LeNet-5 on MNIST depending on the specific run and training setting. Our historical reproduction reaches 1.13% error: within 0.18 percentage points of the 0.95% run, but not within 0.2 percentage points of the best 0.8% figure.
 
 ## Approach
 
@@ -167,15 +167,15 @@ Final ResNet-18 baseline run:
 | Metric | LeNet-5 | ResNet-18 |
 |---|---:|---:|
 | Parameters | 60,000 | 11,172,810 |
-| Epochs | TODO | 5 |
-| Device used | TODO | CPU |
-| Training time | TODO | 726.28 s |
-| Best validation accuracy | TODO | 98.88% |
-| Test accuracy | TODO | 99.18% |
-| Test error | TODO | 0.82% |
-| Checkpoint size | TODO | 44.77 MB |
+| Epochs | 20 | 5 |
+| Device used | CPU | CPU |
+| Training time | 125.94 s | 726.28 s |
+| Best validation accuracy | 98.64% | 98.88% |
+| Test accuracy | 98.87% | 99.18% |
+| Test error | 1.13% | 0.82% |
+| Checkpoint size | 0.26 MB | 44.77 MB |
 
-The modern ResNet-18 baseline is already trained. The historical LeNet-5 column should be filled from the next cluster run.
+ResNet-18 is more accurate by 0.31 percentage points, but it uses about 186x more trainable parameters and took about 5.8x longer in our CPU run.
 
 ## Make report figures
 

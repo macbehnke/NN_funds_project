@@ -37,14 +37,14 @@ These choices are the core of the historical architecture and make the model eas
 
 ## Result
 
-The previous modernized LeNet run is superseded by the historical implementation. The final values below should be replaced after rerunning `python train.py --model lenet5`:
+The previous LeNet run is superseded by the historical implementation. The final pulled run reports:
 
-- best validation accuracy: TODO
-- test accuracy: TODO
-- test error: TODO
-- training time: TODO
+- best validation accuracy: 98.64%
+- test accuracy: 98.87%
+- test error: 1.13%
+- training time: 125.94 seconds on CPU
 
-LeCun et al. report about 0.8-0.95% error for LeNet-5 depending on the run. We should compare against that range after the updated historical run.
+LeCun et al. report about 0.8-0.95% error for LeNet-5 depending on the run. Our error is within 0.18 percentage points of 0.95%, but not within 0.2 percentage points of 0.8%.
 
 ## Modern baseline
 
@@ -57,7 +57,7 @@ python evaluate.py --model resnet18 --checkpoint checkpoints/resnet18_mnist_best
 
 This represents what we would try today: a deeper residual network with batch normalization. For MNIST, ResNet-18 is probably overpowered, but it is useful for explaining the historical difference between compact early CNNs and modern deep residual architectures.
 
-The ResNet-18 baseline reached 99.18% test accuracy with 11,172,810 parameters and 726.28 seconds of CPU training. The historical LeNet-5 comparison should be updated after the new run.
+The ResNet-18 baseline reached 99.18% test accuracy with 11,172,810 parameters and 726.28 seconds of CPU training. Historical LeNet-5 reached 98.87% test accuracy with 60,000 parameters and 125.94 seconds of CPU training.
 
 ## Historical LeNet-5 experiment
 

@@ -12,7 +12,7 @@ LeNet-5 was introduced by LeCun et al. for document recognition and became one o
 
 Compared with fully connected neural networks, CNNs use far fewer parameters for image inputs and learn local visual features such as strokes, curves, and digit parts. Modern CNNs use different activations, batch normalization, residual connections, and larger datasets, but LeNet remains a compact baseline for explaining the core idea.
 
-The 1998 paper reports LeNet-5 at about 0.8% error on the MNIST test set. Our reproduction reaches 1.17% error. This is close for a short, simple run, but it does not meet the stricter wow target of matching within 0.2 percentage points.
+The 1998 paper reports LeNet-5 at about 0.8-0.95% error on the MNIST test set depending on the run. Our historical reproduction reaches 1.13% error, which is close to the 0.95% result but not equal to the best reported 0.8% result.
 
 ## 3. Dataset
 
@@ -92,15 +92,15 @@ python train.py --cpu --epochs 8 --batch-size 128
 | Metric | Value |
 |---|---:|
 | Parameters | 60,000 |
-| Epochs | TODO after historical run |
+| Epochs | 20 |
 | Batch size | 128 |
 | Learning rate | 0.001 |
-| Device | TODO after historical run |
-| Best validation accuracy | TODO after historical run |
-| Test accuracy | TODO after historical run |
-| Test error | TODO after historical run |
-| Test loss | TODO after historical run |
-| Training time | TODO after historical run |
+| Device | CPU |
+| Best validation accuracy | 98.64% |
+| Test accuracy | 98.87% |
+| Test error | 1.13% |
+| Test loss | 0.7290 |
+| Training time | 125.94 seconds |
 
 The model fits the course feasibility constraint comfortably: it trains end-to-end in far less than one hour, even on CPU.
 
@@ -108,11 +108,12 @@ Comparison to the paper:
 
 | System | Test error |
 |---|---:|
-| LeNet-5 reported by LeCun et al. | about 0.8% |
-| Our LeNet-5 style reproduction | 1.17% |
-| Gap | 0.37 percentage points |
+| LeNet-5 reported by LeCun et al. | about 0.8-0.95% |
+| Our historical LeNet-5 reproduction | 1.13% |
+| Gap to 0.95% result | 0.18 percentage points |
+| Gap to 0.8% result | 0.33 percentage points |
 
-The final historical comparison should be filled after rerunning the updated `lenet5` model on the cluster.
+This is a defensible reproduction result: it is within 0.2 percentage points of the 0.95% historical run, but not within 0.2 percentage points of the strongest 0.8% result.
 
 ## 7. Error Analysis
 
@@ -188,7 +189,7 @@ Why these changes are reasonable:
 Why these changes matter:
 
 - They make the project easier to reproduce, but they also mean the result is not an exact historical reproduction.
-- The 1.17% test error is close to the paper's 0.8%, but the gap is large enough that we should call this a LeNet-5 style reproduction, not a perfect replication.
+- The 1.13% test error is close to the paper's 0.95% run, but not to the strongest 0.8% figure.
 
 ## 11. Modern Baseline: ResNet-18
 
@@ -206,15 +207,15 @@ Final comparison:
 | Metric | LeNet-5 | ResNet-18 |
 |---|---:|---:|
 | Parameters | 60,000 | 11,172,810 |
-| Epochs | TODO | 5 |
-| Device | TODO | CPU |
-| Training time | TODO | 726.28 s |
-| Best validation accuracy | TODO | 98.88% |
-| Test accuracy | TODO | 99.18% |
-| Test error | TODO | 0.82% |
-| Checkpoint size | TODO | 44.77 MB |
+| Epochs | 20 | 5 |
+| Device | CPU | CPU |
+| Training time | 125.94 s | 726.28 s |
+| Best validation accuracy | 98.64% | 98.88% |
+| Test accuracy | 98.87% | 99.18% |
+| Test error | 1.13% | 0.82% |
+| Checkpoint size | 0.26 MB | 44.77 MB |
 
-The ResNet-18 result is already available. The historical LeNet-5 values should be filled after the updated cluster run.
+ResNet-18 improves test accuracy by 0.31 percentage points, but uses about 186 times more trainable parameters and takes about 5.8 times longer in our CPU run. This makes the comparison more interesting than simply saying that the modern model is better: historical LeNet-5 is almost as accurate on MNIST while being much smaller and easier to explain.
 
 ## 12. Limitations and Future Work
 

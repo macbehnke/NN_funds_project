@@ -50,10 +50,10 @@ Mention parameter count from final run.
 Final metrics:
 
 - parameters: 60,000
-- best validation accuracy: TODO after historical cluster run
-- test accuracy: TODO after historical cluster run
-- test error: TODO after historical cluster run
-- training time: TODO after historical cluster run
+- best validation accuracy: 98.64%
+- test accuracy: 98.87%
+- test error: 1.13%
+- training time: 125.94 seconds on CPU
 
 Compare to LeNet-5 paper:
 
@@ -107,6 +107,7 @@ Show one of:
 - Reproduced a classic CNN baseline
 - Built clean train/evaluate/demo pipeline
 - Historical LeNet-5 has exactly 60,000 trainable parameters
+- Final historical LeNet-5 test accuracy is 98.87%
 - Explained differences from the 1998 LeNet-5 design
 
 ## 14. Q&A
