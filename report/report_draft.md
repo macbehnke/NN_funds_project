@@ -34,7 +34,7 @@ The test set is used only at the end. Images are normalized using the standard M
 
 ## 4. Model Architecture
 
-The implemented model is a LeNet-5 style CNN:
+The first implemented model is a LeNet-5 style CNN:
 
 ```text
 Input: 1 x 28 x 28
@@ -55,6 +55,16 @@ Linear: 84 -> 10
 The model has 61,706 trainable parameters.
 
 The original 1998 LeNet-5 used 32x32 inputs, trainable average-pooling/subsampling, partial connectivity between some feature maps, and a final RBF-style classifier. This project keeps the visible layer sizes and the tanh plus average-pooling design, but uses a standard fully connected output layer with cross-entropy loss. That choice makes the experiment simpler, easier to reproduce in PyTorch, and easier to compare with a modern classifier.
+
+After the first run, we also added `lenet5_faithful`, a more historical architecture:
+
+- MNIST is padded from 28x28 to 32x32.
+- Activations use the scaled tanh form from the LeNet paper.
+- S2 and S4 are trainable average-subsampling layers.
+- C3 uses the historical partial feature-map connectivity table.
+- C5 is implemented as a 5x5 convolution producing 120 feature maps.
+
+The remaining modern simplification is the final classifier: we keep a standard `84 -> 10` linear output trained with cross-entropy instead of the original RBF-style output. This gives a much more faithful architecture without making training unnecessarily fragile.
 
 ## 5. Training Details
 

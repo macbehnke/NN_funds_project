@@ -58,3 +58,13 @@ python evaluate.py --model resnet18 --checkpoint checkpoints/resnet18_mnist_best
 This represents what we would try today: a deeper residual network with batch normalization. For MNIST, ResNet-18 is probably overpowered, but it is useful for explaining the historical difference between compact early CNNs and modern deep residual architectures.
 
 The final baseline reached 99.18% test accuracy, compared with 98.83% for LeNet-5. The cost is large: 11,172,810 parameters instead of 61,706, and 726.28 seconds of CPU training instead of 16.81 seconds. This makes the comparison more interesting than simply saying "ResNet is better": it is better on accuracy, but much less efficient for this task.
+
+## Faithful LeNet-5 experiment
+
+We added a separate `lenet5_faithful` architecture to support a stricter historical reproduction. It pads MNIST to 32x32, uses scaled tanh activations, trainable average subsampling, partial C3 connectivity, and a convolutional C5 layer. The only major simplification left is the output layer: we use modern cross-entropy instead of the original RBF output.
+
+This model should be trained separately so we can compare three systems:
+
+- modernized LeNet-5;
+- faithful LeNet-5 architecture;
+- ResNet-18 modern baseline.

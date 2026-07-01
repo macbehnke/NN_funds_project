@@ -10,7 +10,7 @@ from torch.optim import Adam
 from tqdm import tqdm
 
 from src.data import get_dataloaders
-from src.model import build_model, count_parameters
+from src.model import build_model, count_parameters, uses_32x32_input
 from src.utils import ensure_dir, get_device, save_json, set_seed
 
 
@@ -53,7 +53,12 @@ def run_epoch(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Train LeNet-5 or ResNet-18 on MNIST.")
-    parser.add_argument("--model", choices=["lenet5", "resnet18"], default="lenet5", help="Model architecture.")
+    parser.add_argument(
+        "--model",
+        choices=["lenet5", "lenet5_faithful", "resnet18"],
+        default="lenet5",
+        help="Model architecture.",
+    )
     parser.add_argument("--data-dir", type=Path, default=Path("data"), help="Directory for MNIST data.")
     parser.add_argument("--checkpoint-dir", type=Path, default=Path("checkpoints"), help="Where to save model checkpoints.")
     parser.add_argument("--metrics-path", type=Path, default=Path("outputs/metrics.json"), help="Where to save final metrics.")
@@ -91,6 +96,7 @@ def main() -> None:
         val_size=args.val_size,
         seed=args.seed,
         num_workers=args.num_workers,
+        pad_to_32=uses_32x32_input(args.model),
     )
 
     model = build_model(args.model).to(device)

@@ -11,13 +11,17 @@ MNIST_MEAN = (0.1307,)
 MNIST_STD = (0.3081,)
 
 
-def mnist_transforms() -> transforms.Compose:
-    return transforms.Compose(
+def mnist_transforms(pad_to_32: bool = False) -> transforms.Compose:
+    steps = []
+    if pad_to_32:
+        steps.append(transforms.Pad(2))
+    steps.extend(
         [
             transforms.ToTensor(),
             transforms.Normalize(MNIST_MEAN, MNIST_STD),
         ]
     )
+    return transforms.Compose(steps)
 
 
 def get_dataloaders(
@@ -26,9 +30,10 @@ def get_dataloaders(
     val_size: int,
     seed: int,
     num_workers: int,
+    pad_to_32: bool = False,
 ) -> tuple[DataLoader, DataLoader, DataLoader]:
     data_path = Path(data_dir)
-    transform = mnist_transforms()
+    transform = mnist_transforms(pad_to_32=pad_to_32)
 
     full_train = datasets.MNIST(root=data_path, train=True, download=True, transform=transform)
     test_dataset = datasets.MNIST(root=data_path, train=False, download=True, transform=transform)

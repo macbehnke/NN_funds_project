@@ -121,6 +121,25 @@ Training saves:
 - best model checkpoint: `checkpoints/lenet5_mnist_best.pt`
 - metrics file: `outputs/metrics.json`
 
+## Train historically faithful LeNet-5
+
+The default `lenet5` model is the compact modernized version used for the first final run. The repository also includes `lenet5_faithful`, which is closer to LeCun et al. 1998:
+
+- pads MNIST from 28x28 to 32x32;
+- uses scaled tanh activations;
+- uses trainable average subsampling layers;
+- uses the partial C3 connectivity table;
+- uses a convolutional C5 layer with 120 maps.
+
+Run:
+
+```bash
+python train.py --model lenet5_faithful --epochs 8 --batch-size 128 --num-workers 2 --metrics-path outputs/lenet5_faithful_metrics.json
+python evaluate.py --model lenet5_faithful --checkpoint checkpoints/lenet5_faithful_mnist_best.pt --num-workers 2 --output outputs/lenet5_faithful_evaluation.json
+```
+
+This model still uses a modern `84 -> 10` linear classifier trained with cross-entropy. That keeps training stable while reproducing the historical feature extractor much more closely.
+
 ## Evaluate
 
 ```bash
