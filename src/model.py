@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import torch
 from torch import nn
+from torchvision.models import resnet18
 
 
 class LeNet5(nn.Module):
@@ -35,6 +36,29 @@ class LeNet5(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.features(x)
         return self.classifier(x)
+
+
+def build_resnet18_mnist(num_classes: int = 10) -> nn.Module:
+    """ResNet-18 adapted for small 1-channel MNIST images.
+
+    This is the "what we would do today" baseline. It keeps the ResNet-18
+    residual block design, but changes the image stem so 28x28 MNIST images are
+    not aggressively downsampled at the first layer.
+    """
+
+    model = resnet18(weights=None, num_classes=num_classes)
+    model.conv1 = nn.Conv2d(1, 64, kernel_size=3, stride=1, padding=1, bias=False)
+    model.maxpool = nn.Identity()
+    return model
+
+
+def build_model(name: str, num_classes: int = 10) -> nn.Module:
+    normalized = name.lower()
+    if normalized == "lenet5":
+        return LeNet5(num_classes=num_classes)
+    if normalized == "resnet18":
+        return build_resnet18_mnist(num_classes=num_classes)
+    raise ValueError(f"Unknown model: {name}")
 
 
 def count_parameters(model: nn.Module) -> int:

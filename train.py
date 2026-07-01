@@ -10,7 +10,7 @@ from torch.optim import Adam
 from tqdm import tqdm
 
 from src.data import get_dataloaders
-from src.model import LeNet5, count_parameters
+from src.model import build_model, count_parameters
 from src.utils import ensure_dir, get_device, save_json, set_seed
 
 
@@ -52,7 +52,8 @@ def run_epoch(
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Train LeNet-5 on MNIST.")
+    parser = argparse.ArgumentParser(description="Train LeNet-5 or ResNet-18 on MNIST.")
+    parser.add_argument("--model", choices=["lenet5", "resnet18"], default="lenet5", help="Model architecture.")
     parser.add_argument("--data-dir", type=Path, default=Path("data"), help="Directory for MNIST data.")
     parser.add_argument("--checkpoint-dir", type=Path, default=Path("checkpoints"), help="Where to save model checkpoints.")
     parser.add_argument("--metrics-path", type=Path, default=Path("outputs/metrics.json"), help="Where to save final metrics.")
@@ -81,6 +82,9 @@ def main() -> None:
     set_seed(args.seed)
     device = get_device(prefer_cuda=not args.cpu)
 
+    if args.model != "lenet5" and args.metrics_path == Path("outputs/metrics.json"):
+        args.metrics_path = Path(f"outputs/{args.model}_metrics.json")
+
     train_loader, val_loader, test_loader = get_dataloaders(
         data_dir=args.data_dir,
         batch_size=args.batch_size,
@@ -89,12 +93,12 @@ def main() -> None:
         num_workers=args.num_workers,
     )
 
-    model = LeNet5().to(device)
+    model = build_model(args.model).to(device)
     criterion = nn.CrossEntropyLoss()
     optimizer = Adam(model.parameters(), lr=args.lr)
 
     checkpoint_dir = ensure_dir(args.checkpoint_dir)
-    best_checkpoint_path = checkpoint_dir / "lenet5_mnist_best.pt"
+    best_checkpoint_path = checkpoint_dir / f"{args.model}_mnist_best.pt"
 
     best_val_accuracy = 0.0
     history: list[dict[str, float | int]] = []
@@ -140,7 +144,7 @@ def main() -> None:
     elapsed_seconds = time.time() - start
 
     metrics = {
-        "model": "LeNet5",
+        "model": args.model,
         "dataset": "MNIST",
         "seed": args.seed,
         "device": str(device),

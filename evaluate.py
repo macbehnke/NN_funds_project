@@ -9,12 +9,13 @@ from sklearn.metrics import classification_report, confusion_matrix
 from torch import nn
 
 from src.data import get_dataloaders
-from src.model import LeNet5
+from src.model import build_model
 from src.utils import get_device, save_json, set_seed
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Evaluate a trained LeNet-5 checkpoint on MNIST.")
+    parser = argparse.ArgumentParser(description="Evaluate a trained MNIST checkpoint.")
+    parser.add_argument("--model", choices=["lenet5", "resnet18"], default="lenet5")
     parser.add_argument("--checkpoint", type=Path, default=Path("checkpoints/lenet5_mnist_best.pt"))
     parser.add_argument("--data-dir", type=Path, default=Path("data"))
     parser.add_argument("--batch-size", type=int, default=256)
@@ -31,6 +32,11 @@ def main() -> None:
     set_seed(args.seed)
     device = get_device(prefer_cuda=not args.cpu)
 
+    if args.model != "lenet5" and args.checkpoint == Path("checkpoints/lenet5_mnist_best.pt"):
+        args.checkpoint = Path(f"checkpoints/{args.model}_mnist_best.pt")
+    if args.model != "lenet5" and args.output == Path("outputs/evaluation.json"):
+        args.output = Path(f"outputs/{args.model}_evaluation.json")
+
     _, _, test_loader = get_dataloaders(
         data_dir=args.data_dir,
         batch_size=args.batch_size,
@@ -39,7 +45,7 @@ def main() -> None:
         num_workers=args.num_workers,
     )
 
-    model = LeNet5().to(device)
+    model = build_model(args.model).to(device)
     checkpoint = torch.load(args.checkpoint, map_location=device)
     model.load_state_dict(checkpoint["model_state_dict"])
     model.eval()

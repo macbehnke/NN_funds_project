@@ -8,6 +8,23 @@ The goal is to reproduce a classic convolutional neural network baseline for han
 
 This is intentionally a small, reproducible project: the full model trains end-to-end on CPU or a modest GPU, uses a public dataset downloaded by `torchvision`, and can be demonstrated from a saved checkpoint.
 
+## Final result
+
+Final cluster run:
+
+| Metric | Value |
+|---|---:|
+| Model | LeNet-5 style CNN |
+| Parameters | 61,706 |
+| Epochs | 8 |
+| Device used | CPU |
+| Training time | 16.81 seconds |
+| Best validation accuracy | 98.68% |
+| Test accuracy | 98.83% |
+| Test error | 1.17% |
+
+LeCun et al. reported about 0.8% test error for LeNet-5 on MNIST. Our reproduction is close, but not within the 0.2 percentage-point wow target: the gap is 0.37 percentage points. We report this honestly and discuss likely causes in the report.
+
 ## Approach
 
 We implement a LeNet-5 style CNN:
@@ -20,7 +37,7 @@ We implement a LeNet-5 style CNN:
 - average pooling
 - fully connected layers: `400 -> 120 -> 84 -> 10`
 
-The original LeNet-5 used 32x32 inputs and an RBF-style output layer. This project keeps the classical architecture shape but uses a standard linear classifier and cross-entropy loss, which is the modern PyTorch convention for multi-class classification.
+The original LeNet-5 used 32x32 inputs, trainable average-pooling/subsampling, partial connectivity in the second convolutional layer, and a final Gaussian/RBF-style output layer. This project keeps the exact visible layer sizes and tanh/average-pooling structure, but uses a standard fully connected classifier and cross-entropy loss, which is the modern PyTorch convention for multi-class classification.
 
 ## Dataset
 
@@ -78,7 +95,7 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-## Train
+## Train LeNet-5
 
 Default run:
 
@@ -115,6 +132,17 @@ This saves detailed test metrics to:
 outputs/evaluation.json
 ```
 
+## Optional ResNet-18 baseline
+
+The project also includes a modern baseline path:
+
+```bash
+python train.py --model resnet18 --epochs 5 --batch-size 128 --num-workers 2 --metrics-path outputs/resnet18_metrics.json
+python evaluate.py --model resnet18 --checkpoint checkpoints/resnet18_mnist_best.pt --num-workers 2 --output outputs/resnet18_evaluation.json
+```
+
+This adapts ResNet-18 to one-channel 28x28 MNIST images by replacing the first convolution and removing the initial max-pooling layer.
+
 ## Make report figures
 
 After training and evaluation:
@@ -149,11 +177,9 @@ The demo saves a visualization to:
 outputs/demo_prediction.png
 ```
 
-## Expected result
+## Reproduce final result
 
-With the default configuration, the model should normally reach around 98-99% test accuracy after several epochs. The exact value depends on hardware, PyTorch version, and deterministic behavior of the environment.
-
-Use the final value from `outputs/metrics.json` in the report and presentation.
+The committed final run produced `outputs/metrics.json`, `outputs/evaluation.json`, figures in `outputs/`, and `checkpoints/lenet5_mnist_best.pt`. Re-running training should normally produce a result around 98-99% test accuracy, though exact values can differ slightly by environment.
 
 ## Reproducibility
 

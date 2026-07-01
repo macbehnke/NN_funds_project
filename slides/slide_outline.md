@@ -47,12 +47,19 @@ Mention parameter count from final run.
 
 ## 7. Results
 
-Add final metrics:
+Final metrics:
 
-- validation accuracy
-- test accuracy
-- training time
-- confusion matrix summary
+- parameters: 61,706
+- best validation accuracy: 98.68%
+- test accuracy: 98.83%
+- test error: 1.17%
+- training time: 16.81 seconds on CPU
+
+Compare to LeNet-5 paper:
+
+- reported LeNet-5 test error: about 0.8%
+- our gap: 0.37 percentage points
+- honest conclusion: close, but not within 0.2 percentage points
 
 ## 8. Error Analysis
 
@@ -87,18 +94,19 @@ Show the saved prediction image or run it live.
 
 ## 12. Optional Wow Slide
 
-Ideas if there is time:
+Show one of:
 
-- Compare with team handwritten digits
-- Show a custom image demo
-- Add FGSM adversarial examples
-- Compare `tanh` vs `ReLU`
+- training curves from `outputs/training_curves.png`
+- confusion matrix from `outputs/confusion_matrix.png`
+- misclassified examples from `outputs/misclassified_examples.png`
+- ResNet-18 baseline command and architecture comparison
 
 ## 13. Conclusion
 
 - Reproduced a classic CNN baseline
 - Built clean train/evaluate/demo pipeline
-- Reached expected high accuracy with a small model
+- Reached 98.83% test accuracy with a 61,706-parameter model
+- Explained differences from the 1998 LeNet-5 design
 
 ## 14. Q&A
 
