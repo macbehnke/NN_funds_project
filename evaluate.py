@@ -6,16 +6,15 @@ from pathlib import Path
 import numpy as np
 import torch
 from sklearn.metrics import classification_report, confusion_matrix
-from torch import nn
 
 from src.data import get_dataloaders
-from src.model import build_model, uses_32x32_input
+from src.model import build_loss, build_model, predictions_from_output, uses_32x32_input
 from src.utils import get_device, save_json, set_seed
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Evaluate a trained MNIST checkpoint.")
-    parser.add_argument("--model", choices=["lenet5", "lenet5_faithful", "resnet18"], default="lenet5")
+    parser.add_argument("--model", choices=["lenet5", "resnet18"], default="lenet5")
     parser.add_argument("--checkpoint", type=Path, default=Path("checkpoints/lenet5_mnist_best.pt"))
     parser.add_argument("--data-dir", type=Path, default=Path("data"))
     parser.add_argument("--batch-size", type=int, default=256)
@@ -51,7 +50,7 @@ def main() -> None:
     model.load_state_dict(checkpoint["model_state_dict"])
     model.eval()
 
-    criterion = nn.CrossEntropyLoss()
+    criterion = build_loss(args.model)
     losses: list[float] = []
     y_true: list[int] = []
     y_pred: list[int] = []
@@ -60,9 +59,9 @@ def main() -> None:
         for images, labels in test_loader:
             images = images.to(device)
             labels = labels.to(device)
-            logits = model(images)
-            loss = criterion(logits, labels)
-            predictions = logits.argmax(dim=1)
+            output = model(images)
+            loss = criterion(output, labels)
+            predictions = predictions_from_output(args.model, output)
 
             losses.append(loss.item() * labels.size(0))
             y_true.extend(labels.cpu().tolist())

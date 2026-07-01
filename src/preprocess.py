@@ -12,13 +12,17 @@ from torchvision import transforms
 from src.data import MNIST_MEAN, MNIST_STD
 
 
-def normalize_mnist_image(image: Image.Image) -> torch.Tensor:
-    transform = transforms.Compose(
+def normalize_mnist_image(image: Image.Image, pad_to_32: bool = True) -> torch.Tensor:
+    steps = []
+    if pad_to_32:
+        steps.append(transforms.Pad(2))
+    steps.extend(
         [
             transforms.ToTensor(),
             transforms.Normalize(MNIST_MEAN, MNIST_STD),
         ]
     )
+    transform = transforms.Compose(steps)
     return transform(image).unsqueeze(0)
 
 

@@ -6,7 +6,7 @@ from pathlib import Path
 import torch
 from flask import Flask, jsonify, request
 
-from src.model import LeNet5
+from src.model import build_model, predictions_from_output
 from src.preprocess import preprocess_canvas_data_url
 from src.utils import get_device
 
@@ -232,7 +232,7 @@ HTML = """
 def create_app(checkpoint_path: Path, cpu: bool = False) -> Flask:
     app = Flask(__name__)
     device = get_device(prefer_cuda=not cpu)
-    model = LeNet5().to(device)
+    model = build_model("lenet5").to(device)
     checkpoint = torch.load(checkpoint_path, map_location=device)
     model.load_state_dict(checkpoint["model_state_dict"])
     model.eval()
@@ -248,10 +248,10 @@ def create_app(checkpoint_path: Path, cpu: bool = False) -> Flask:
         image_tensor = preprocess_canvas_data_url(image_data).to(device)
 
         with torch.no_grad():
-            logits = model(image_tensor)
-            probabilities = torch.softmax(logits, dim=1).squeeze(0).cpu()
+            penalties = model(image_tensor)
+            probabilities = torch.softmax(-penalties, dim=1).squeeze(0).cpu()
 
-        prediction = int(probabilities.argmax().item())
+        prediction = int(predictions_from_output("lenet5", penalties).item())
         confidence = float(probabilities[prediction].item())
         return jsonify(
             {

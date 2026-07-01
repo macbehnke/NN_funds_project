@@ -9,7 +9,7 @@ The project topic asks for LeNet-5 on MNIST, faithful to LeCun 1998, plus a comp
 - Tanh activations.
 - Average pooling.
 - Fully connected layers with 120 and 84 hidden units.
-- A compact model: 61,706 trainable parameters.
+- A compact model: 60,000 trainable parameters.
 
 These choices are the core of the historical architecture and make the model easy to explain from CNN fundamentals.
 
@@ -17,7 +17,7 @@ These choices are the core of the historical architecture and make the model eas
 
 1. Input size
 
-   The original LeNet-5 used 32x32 normalized digit images. MNIST images are 28x28. We used the 28x28 images directly and padded only in the first convolution to preserve a clean feature-map shape.
+   The original LeNet-5 used 32x32 normalized digit images. MNIST images are 28x28, so the current implementation pads each side by 2 pixels before the first convolution.
 
 2. Connectivity
 
@@ -25,7 +25,7 @@ These choices are the core of the historical architecture and make the model eas
 
 3. Output layer
 
-   The original system used a Gaussian/RBF-style output. We used a linear classifier with cross-entropy loss. This is the modern default for multi-class neural classification.
+   The original system used Euclidean RBF output units. The current `lenet5` implementation also uses fixed Euclidean RBF output units and the paper's MAP-style penalty loss.
 
 4. Optimizer
 
@@ -37,14 +37,14 @@ These choices are the core of the historical architecture and make the model eas
 
 ## Result
 
-Our final run reached:
+The previous modernized LeNet run is superseded by the historical implementation. The final values below should be replaced after rerunning `python train.py --model lenet5`:
 
-- best validation accuracy: 98.68%
-- test accuracy: 98.83%
-- test error: 1.17%
-- training time: 16.81 seconds on CPU
+- best validation accuracy: TODO
+- test accuracy: TODO
+- test error: TODO
+- training time: TODO
 
-LeCun et al. report about 0.8% error for LeNet-5. Our reproduction is close, but the gap is 0.37 percentage points, so we should not claim that we matched the paper within 0.2 percentage points.
+LeCun et al. report about 0.8-0.95% error for LeNet-5 depending on the run. We should compare against that range after the updated historical run.
 
 ## Modern baseline
 
@@ -57,14 +57,13 @@ python evaluate.py --model resnet18 --checkpoint checkpoints/resnet18_mnist_best
 
 This represents what we would try today: a deeper residual network with batch normalization. For MNIST, ResNet-18 is probably overpowered, but it is useful for explaining the historical difference between compact early CNNs and modern deep residual architectures.
 
-The final baseline reached 99.18% test accuracy, compared with 98.83% for LeNet-5. The cost is large: 11,172,810 parameters instead of 61,706, and 726.28 seconds of CPU training instead of 16.81 seconds. This makes the comparison more interesting than simply saying "ResNet is better": it is better on accuracy, but much less efficient for this task.
+The ResNet-18 baseline reached 99.18% test accuracy with 11,172,810 parameters and 726.28 seconds of CPU training. The historical LeNet-5 comparison should be updated after the new run.
 
-## Faithful LeNet-5 experiment
+## Historical LeNet-5 experiment
 
-We added a separate `lenet5_faithful` architecture to support a stricter historical reproduction. It pads MNIST to 32x32, uses scaled tanh activations, trainable average subsampling, partial C3 connectivity, and a convolutional C5 layer. The only major simplification left is the output layer: we use modern cross-entropy instead of the original RBF output.
+The default `lenet5` architecture now supports a stricter historical reproduction. It pads MNIST to 32x32, uses scaled tanh activations, trainable average subsampling, partial C3 connectivity, convolutional C5, F6 with 84 units, fixed +1/-1 RBF target vectors, and MAP-style penalty loss.
 
-This model should be trained separately so we can compare three systems:
+This lets the final project compare two systems:
 
-- modernized LeNet-5;
-- faithful LeNet-5 architecture;
+- historical LeNet-5 reproduction;
 - ResNet-18 modern baseline.

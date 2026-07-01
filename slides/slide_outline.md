@@ -8,7 +8,7 @@ Names, course, date.
 
 ## 2. Problem
 
-- Input: 28x28 handwritten digit image
+- Input: 28x28 MNIST image padded to 32x32
 - Output: digit class 0-9
 - Goal: train a small CNN that is accurate, reproducible, and easy to demo
 
@@ -39,7 +39,7 @@ Mention parameter count from final run.
 ## 6. Training Setup
 
 - Adam optimizer
-- cross-entropy loss
+- LeNet-5 MAP-style RBF penalty loss
 - batch size 128
 - 8 epochs
 - fixed random seed
@@ -49,11 +49,11 @@ Mention parameter count from final run.
 
 Final metrics:
 
-- parameters: 61,706
-- best validation accuracy: 98.68%
-- test accuracy: 98.83%
-- test error: 1.17%
-- training time: 16.81 seconds on CPU
+- parameters: 60,000
+- best validation accuracy: TODO after historical cluster run
+- test accuracy: TODO after historical cluster run
+- test error: TODO after historical cluster run
+- training time: TODO after historical cluster run
 
 Compare to LeNet-5 paper:
 
@@ -106,7 +106,7 @@ Show one of:
 
 - Reproduced a classic CNN baseline
 - Built clean train/evaluate/demo pipeline
-- Reached 98.83% test accuracy with a 61,706-parameter model
+- Historical LeNet-5 has exactly 60,000 trainable parameters
 - Explained differences from the 1998 LeNet-5 design
 
 ## 14. Q&A

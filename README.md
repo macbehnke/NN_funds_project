@@ -10,20 +10,20 @@ This is intentionally a small, reproducible project: the full model trains end-t
 
 ## Final result
 
-Final cluster run:
+Historical LeNet-5 final run:
 
 | Metric | Value |
 |---|---:|
-| Model | LeNet-5 style CNN |
-| Parameters | 61,706 |
-| Epochs | 8 |
-| Device used | CPU |
-| Training time | 16.81 seconds |
-| Best validation accuracy | 98.68% |
-| Test accuracy | 98.83% |
-| Test error | 1.17% |
+| Model | Historical LeNet-5 with RBF output |
+| Parameters | 60,000 |
+| Epochs | TODO after cluster run |
+| Device used | TODO after cluster run |
+| Training time | TODO after cluster run |
+| Best validation accuracy | TODO after cluster run |
+| Test accuracy | TODO after cluster run |
+| Test error | TODO after cluster run |
 
-LeCun et al. reported about 0.8% test error for LeNet-5 on MNIST. Our reproduction is close, but not within the 0.2 percentage-point wow target: the gap is 0.37 percentage points. We report this honestly and discuss likely causes in the report.
+LeCun et al. reported about 0.8-0.95% test error for LeNet-5 on MNIST depending on the specific run and training setting. The historical model must be rerun after this architecture update before reporting the final comparison.
 
 ## Approach
 
@@ -35,9 +35,9 @@ We implement a LeNet-5 style CNN:
 - convolution 2: `6 -> 16`, kernel `5x5`
 - `tanh`
 - average pooling
-- fully connected layers: `400 -> 120 -> 84 -> 10`
+- C5 convolution with 120 maps, F6 with 84 units, and fixed RBF output prototypes
 
-The original LeNet-5 used 32x32 inputs, trainable average-pooling/subsampling, partial connectivity in the second convolutional layer, and a final Gaussian/RBF-style output layer. This project keeps the exact visible layer sizes and tanh/average-pooling structure, but uses a standard fully connected classifier and cross-entropy loss, which is the modern PyTorch convention for multi-class classification.
+The implemented `lenet5` model is the historical LeNet-5 reproduction path: 32x32 padded inputs, scaled tanh activations, trainable average subsampling, partial C3 connectivity, convolutional C5, F6 with 84 units, and fixed Euclidean RBF output units with the paper's MAP-style discriminative loss.
 
 ## Dataset
 
@@ -121,24 +121,23 @@ Training saves:
 - best model checkpoint: `checkpoints/lenet5_mnist_best.pt`
 - metrics file: `outputs/metrics.json`
 
-## Train historically faithful LeNet-5
+## Train historical LeNet-5
 
-The default `lenet5` model is the compact modernized version used for the first final run. The repository also includes `lenet5_faithful`, which is closer to LeCun et al. 1998:
+The default `lenet5` model is now the historical reproduction:
 
 - pads MNIST from 28x28 to 32x32;
 - uses scaled tanh activations;
 - uses trainable average subsampling layers;
 - uses the partial C3 connectivity table;
-- uses a convolutional C5 layer with 120 maps.
+- uses a convolutional C5 layer with 120 maps;
+- uses fixed Euclidean RBF output units and MAP-style loss.
 
 Run:
 
 ```bash
-python train.py --model lenet5_faithful --epochs 8 --batch-size 128 --num-workers 2 --metrics-path outputs/lenet5_faithful_metrics.json
-python evaluate.py --model lenet5_faithful --checkpoint checkpoints/lenet5_faithful_mnist_best.pt --num-workers 2 --output outputs/lenet5_faithful_evaluation.json
+python train.py --model lenet5 --epochs 20 --batch-size 128 --num-workers 2 --metrics-path outputs/metrics.json
+python evaluate.py --model lenet5 --checkpoint checkpoints/lenet5_mnist_best.pt --num-workers 2 --output outputs/evaluation.json
 ```
-
-This model still uses a modern `84 -> 10` linear classifier trained with cross-entropy. That keeps training stable while reproducing the historical feature extractor much more closely.
 
 ## Evaluate
 
@@ -167,16 +166,16 @@ Final ResNet-18 baseline run:
 
 | Metric | LeNet-5 | ResNet-18 |
 |---|---:|---:|
-| Parameters | 61,706 | 11,172,810 |
-| Epochs | 8 | 5 |
-| Device used | CPU | CPU |
-| Training time | 16.81 s | 726.28 s |
-| Best validation accuracy | 98.68% | 98.88% |
-| Test accuracy | 98.83% | 99.18% |
-| Test error | 1.17% | 0.82% |
-| Checkpoint size | 0.25 MB | 44.77 MB |
+| Parameters | 60,000 | 11,172,810 |
+| Epochs | TODO | 5 |
+| Device used | TODO | CPU |
+| Training time | TODO | 726.28 s |
+| Best validation accuracy | TODO | 98.88% |
+| Test accuracy | TODO | 99.18% |
+| Test error | TODO | 0.82% |
+| Checkpoint size | TODO | 44.77 MB |
 
-The modern ResNet-18 baseline is more accurate by 0.35 percentage points, but it uses about 181x more trainable parameters and took about 43x longer in our CPU run.
+The modern ResNet-18 baseline is already trained. The historical LeNet-5 column should be filled from the next cluster run.
 
 ## Make report figures
 

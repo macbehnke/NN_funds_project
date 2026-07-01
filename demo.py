@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from torchvision import datasets, transforms
 
 from src.data import MNIST_MEAN, MNIST_STD
-from src.model import LeNet5
+from src.model import build_model, predictions_from_output
 from src.preprocess import preprocess_user_file
 from src.utils import get_device
 
@@ -32,7 +32,7 @@ def main() -> None:
     args = parse_args()
     device = get_device(prefer_cuda=not args.cpu)
 
-    model = LeNet5().to(device)
+    model = build_model("lenet5").to(device)
     checkpoint = torch.load(args.checkpoint, map_location=device)
     model.load_state_dict(checkpoint["model_state_dict"])
     model.eval()
@@ -49,6 +49,7 @@ def main() -> None:
             download=True,
             transform=transforms.Compose(
                 [
+                    transforms.Pad(2),
                     transforms.ToTensor(),
                     transforms.Normalize(MNIST_MEAN, MNIST_STD),
                 ]
@@ -60,9 +61,9 @@ def main() -> None:
         display_image = image_tensor.squeeze(0).squeeze(0).numpy()
 
     with torch.no_grad():
-        logits = model(image_tensor.to(device))
-        probabilities = torch.softmax(logits, dim=1).squeeze(0).cpu()
-        prediction = int(probabilities.argmax().item())
+        output = model(image_tensor.to(device))
+        probabilities = torch.softmax(-output, dim=1).squeeze(0).cpu()
+        prediction = int(predictions_from_output("lenet5", output).item())
         confidence = float(probabilities[prediction].item())
 
     args.save_figure.parent.mkdir(parents=True, exist_ok=True)

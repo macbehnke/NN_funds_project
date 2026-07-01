@@ -5,19 +5,19 @@ import time
 from pathlib import Path
 
 import torch
-from torch import nn
 from torch.optim import Adam
 from tqdm import tqdm
 
 from src.data import get_dataloaders
-from src.model import build_model, count_parameters, uses_32x32_input
+from src.model import build_loss, build_model, count_parameters, predictions_from_output, uses_32x32_input
 from src.utils import ensure_dir, get_device, save_json, set_seed
 
 
 def run_epoch(
-    model: nn.Module,
+    model: torch.nn.Module,
+    model_name: str,
     loader: torch.utils.data.DataLoader,
-    criterion: nn.Module,
+    criterion: torch.nn.Module,
     device: torch.device,
     optimizer: torch.optim.Optimizer | None = None,
 ) -> tuple[float, float]:
@@ -36,8 +36,8 @@ def run_epoch(
             optimizer.zero_grad(set_to_none=True)
 
         with torch.set_grad_enabled(is_training):
-            logits = model(images)
-            loss = criterion(logits, labels)
+            output = model(images)
+            loss = criterion(output, labels)
 
             if is_training:
                 loss.backward()
@@ -45,17 +45,17 @@ def run_epoch(
 
         batch_size = labels.size(0)
         total_loss += loss.item() * batch_size
-        correct += (logits.argmax(dim=1) == labels).sum().item()
+        correct += (predictions_from_output(model_name, output) == labels).sum().item()
         total += batch_size
 
     return total_loss / total, correct / total
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Train LeNet-5 or ResNet-18 on MNIST.")
+    parser = argparse.ArgumentParser(description="Train historical LeNet-5 or ResNet-18 on MNIST.")
     parser.add_argument(
         "--model",
-        choices=["lenet5", "lenet5_faithful", "resnet18"],
+        choices=["lenet5", "resnet18"],
         default="lenet5",
         help="Model architecture.",
     )
@@ -100,7 +100,7 @@ def main() -> None:
     )
 
     model = build_model(args.model).to(device)
-    criterion = nn.CrossEntropyLoss()
+    criterion = build_loss(args.model)
     optimizer = Adam(model.parameters(), lr=args.lr)
 
     checkpoint_dir = ensure_dir(args.checkpoint_dir)
@@ -114,8 +114,8 @@ def main() -> None:
     print(f"Trainable parameters: {count_parameters(model):,}")
 
     for epoch in range(1, args.epochs + 1):
-        train_loss, train_accuracy = run_epoch(model, train_loader, criterion, device, optimizer)
-        val_loss, val_accuracy = run_epoch(model, val_loader, criterion, device)
+        train_loss, train_accuracy = run_epoch(model, args.model, train_loader, criterion, device, optimizer)
+        val_loss, val_accuracy = run_epoch(model, args.model, val_loader, criterion, device)
 
         row = {
             "epoch": epoch,
@@ -146,7 +146,7 @@ def main() -> None:
 
     checkpoint = torch.load(best_checkpoint_path, map_location=device)
     model.load_state_dict(checkpoint["model_state_dict"])
-    test_loss, test_accuracy = run_epoch(model, test_loader, criterion, device)
+    test_loss, test_accuracy = run_epoch(model, args.model, test_loader, criterion, device)
     elapsed_seconds = time.time() - start
 
     metrics = {

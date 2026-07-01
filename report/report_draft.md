@@ -37,34 +37,28 @@ The test set is used only at the end. Images are normalized using the standard M
 The first implemented model is a LeNet-5 style CNN:
 
 ```text
-Input: 1 x 28 x 28
-Conv2d: 1 -> 6, kernel 5, padding 2
-Tanh
-Average pooling: 2 x 2
-Conv2d: 6 -> 16, kernel 5
-Tanh
-Average pooling: 2 x 2
-Flatten
-Linear: 400 -> 120
-Tanh
-Linear: 120 -> 84
-Tanh
-Linear: 84 -> 10
+Input: 1 x 32 x 32
+C1: convolution, 1 -> 6 maps, kernel 5, scaled tanh
+S2: trainable average subsampling, 6 maps
+C3: convolution, 6 -> 16 maps, kernel 5, partial connectivity, scaled tanh
+S4: trainable average subsampling, 16 maps
+C5: convolution, 16 -> 120 maps, kernel 5, scaled tanh
+F6: fully connected, 120 -> 84, scaled tanh
+Output: fixed Euclidean RBF units, 84 -> 10 class penalties
 ```
 
-The model has 61,706 trainable parameters.
+The historical LeNet-5 model has exactly 60,000 trainable parameters, matching the count stated in the paper.
 
-The original 1998 LeNet-5 used 32x32 inputs, trainable average-pooling/subsampling, partial connectivity between some feature maps, and a final RBF-style classifier. This project keeps the visible layer sizes and the tanh plus average-pooling design, but uses a standard fully connected output layer with cross-entropy loss. That choice makes the experiment simpler, easier to reproduce in PyTorch, and easier to compare with a modern classifier.
-
-After the first run, we also added `lenet5_faithful`, a more historical architecture:
+The implemented `lenet5` model follows the historical LeNet-5 architecture:
 
 - MNIST is padded from 28x28 to 32x32.
 - Activations use the scaled tanh form from the LeNet paper.
 - S2 and S4 are trainable average-subsampling layers.
 - C3 uses the historical partial feature-map connectivity table.
 - C5 is implemented as a 5x5 convolution producing 120 feature maps.
-
-The remaining modern simplification is the final classifier: we keep a standard `84 -> 10` linear output trained with cross-entropy instead of the original RBF-style output. This gives a much more faithful architecture without making training unnecessarily fragile.
+- F6 has 84 units.
+- The output layer uses fixed Euclidean RBF units with +1/-1 prototype vectors.
+- Training uses the paper's MAP-style discriminative loss over class penalties.
 
 ## 5. Training Details
 
@@ -72,7 +66,7 @@ Default configuration:
 
 - optimizer: Adam
 - learning rate: 0.001
-- loss: cross-entropy
+- loss: LeNet-5 MAP-style RBF penalty loss
 - batch size: 128
 - epochs: 8
 - seed: 42
@@ -97,16 +91,16 @@ python train.py --cpu --epochs 8 --batch-size 128
 
 | Metric | Value |
 |---|---:|
-| Parameters | 61,706 |
-| Epochs | 8 |
+| Parameters | 60,000 |
+| Epochs | TODO after historical run |
 | Batch size | 128 |
 | Learning rate | 0.001 |
-| Device | CPU |
-| Best validation accuracy | 98.68% |
-| Test accuracy | 98.83% |
-| Test error | 1.17% |
-| Test loss | 0.0374 |
-| Training time | 16.81 seconds |
+| Device | TODO after historical run |
+| Best validation accuracy | TODO after historical run |
+| Test accuracy | TODO after historical run |
+| Test error | TODO after historical run |
+| Test loss | TODO after historical run |
+| Training time | TODO after historical run |
 
 The model fits the course feasibility constraint comfortably: it trains end-to-end in far less than one hour, even on CPU.
 
@@ -118,7 +112,7 @@ Comparison to the paper:
 | Our LeNet-5 style reproduction | 1.17% |
 | Gap | 0.37 percentage points |
 
-This is a good practical reproduction, but it should not be presented as matching the paper within 0.2 percentage points. The likely reasons are the simplified output layer, no distortion-based data augmentation, only 8 epochs, and small implementation differences from the original training setup.
+The final historical comparison should be filled after rerunning the updated `lenet5` model on the cluster.
 
 ## 7. Error Analysis
 
@@ -179,17 +173,16 @@ What we kept from the 1998 design:
 
 What we changed:
 
-- We used 28x28 MNIST images directly instead of padding them to 32x32.
-- We used a dense second convolution instead of the original partial feature-map connectivity.
-- We used a standard linear output layer and cross-entropy loss instead of the original RBF-style output.
+- We pad 28x28 MNIST images to 32x32 as in the historical architecture.
+- We reproduce the partial C3 feature-map connectivity.
+- We use fixed Euclidean RBF output units instead of a modern linear classifier.
 - We trained with Adam instead of the original older optimization setup.
 - We did not use distortion-based data augmentation.
 
 Why these changes are reasonable:
 
-- Cross-entropy with logits is the standard modern formulation for multi-class classification.
-- Dense convolution is simpler to explain and avoids custom connectivity code that would add little educational value.
-- Adam gives stable convergence in a short run.
+- The historical RBF output gives a closer reproduction than the modern softmax classifier.
+- Adam gives stable convergence while preserving the historical architecture and output formulation.
 - Avoiding augmentation keeps the experiment focused on the baseline architecture.
 
 Why these changes matter:
@@ -212,16 +205,16 @@ Final comparison:
 
 | Metric | LeNet-5 | ResNet-18 |
 |---|---:|---:|
-| Parameters | 61,706 | 11,172,810 |
-| Epochs | 8 | 5 |
-| Device | CPU | CPU |
-| Training time | 16.81 s | 726.28 s |
-| Best validation accuracy | 98.68% | 98.88% |
-| Test accuracy | 98.83% | 99.18% |
-| Test error | 1.17% | 0.82% |
-| Checkpoint size | 0.25 MB | 44.77 MB |
+| Parameters | 60,000 | 11,172,810 |
+| Epochs | TODO | 5 |
+| Device | TODO | CPU |
+| Training time | TODO | 726.28 s |
+| Best validation accuracy | TODO | 98.88% |
+| Test accuracy | TODO | 99.18% |
+| Test error | TODO | 0.82% |
+| Checkpoint size | TODO | 44.77 MB |
 
-The modern architecture wins on accuracy, but the gain is small for MNIST: ResNet-18 improves test accuracy by 0.35 percentage points while using about 181 times more trainable parameters and taking about 43 times longer in our CPU run. This is a useful result for the presentation: modern deep CNNs are powerful, but LeNet-5 remains a better teaching baseline for this small dataset because it is compact, fast, and easy to explain.
+The ResNet-18 result is already available. The historical LeNet-5 values should be filled after the updated cluster run.
 
 ## 12. Limitations and Future Work
 
