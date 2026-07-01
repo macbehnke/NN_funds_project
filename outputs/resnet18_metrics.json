@@ -1,0 +1,52 @@
+{
+  "model": "resnet18",
+  "dataset": "MNIST",
+  "seed": 42,
+  "device": "cpu",
+  "epochs": 5,
+  "batch_size": 128,
+  "learning_rate": 0.001,
+  "parameters": 11172810,
+  "best_val_accuracy": 0.9888,
+  "test_loss": 0.025412576149962843,
+  "test_accuracy": 0.9918,
+  "elapsed_seconds": 726.2803030014038,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.10513771177421917,
+      "train_accuracy": 0.9676181818181818,
+      "val_loss": 0.08041609213352204,
+      "val_accuracy": 0.9776
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.038494066959484055,
+      "train_accuracy": 0.9883454545454545,
+      "val_loss": 0.03657037118375301,
+      "val_accuracy": 0.9888
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.028485490376570007,
+      "train_accuracy": 0.9910363636363636,
+      "val_loss": 0.04003448997139931,
+      "val_accuracy": 0.9876
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.022169474201480095,
+      "train_accuracy": 0.9930181818181818,
+      "val_loss": 0.042290300817787646,
+      "val_accuracy": 0.9864
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.0208695330709219,
+      "train_accuracy": 0.9933454545454545,
+      "val_loss": 0.060632676947116854,
+      "val_accuracy": 0.9822
+    }
+  ],
+  "checkpoint": "checkpoints/resnet18_mnist_best.pt"
+}
