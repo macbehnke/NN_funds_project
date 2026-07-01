@@ -189,7 +189,7 @@ Why these changes matter:
 
 ## 11. Modern Baseline: ResNet-18
 
-The repository includes an optional ResNet-18 baseline:
+The repository includes a ResNet-18 baseline:
 
 ```bash
 python train.py --model resnet18 --epochs 5 --batch-size 128 --num-workers 2 --metrics-path outputs/resnet18_metrics.json
@@ -197,6 +197,21 @@ python evaluate.py --model resnet18 --checkpoint checkpoints/resnet18_mnist_best
 ```
 
 This baseline represents what we might try today: residual blocks, deeper features, and batch normalization. It is adapted for MNIST by changing the first convolution to accept one-channel images and by removing the initial max-pooling layer so the 28x28 images are not downsampled too aggressively.
+
+Final comparison:
+
+| Metric | LeNet-5 | ResNet-18 |
+|---|---:|---:|
+| Parameters | 61,706 | 11,172,810 |
+| Epochs | 8 | 5 |
+| Device | CPU | CPU |
+| Training time | 16.81 s | 726.28 s |
+| Best validation accuracy | 98.68% | 98.88% |
+| Test accuracy | 98.83% | 99.18% |
+| Test error | 1.17% | 0.82% |
+| Checkpoint size | 0.25 MB | 44.77 MB |
+
+The modern architecture wins on accuracy, but the gain is small for MNIST: ResNet-18 improves test accuracy by 0.35 percentage points while using about 181 times more trainable parameters and taking about 43 times longer in our CPU run. This is a useful result for the presentation: modern deep CNNs are powerful, but LeNet-5 remains a better teaching baseline for this small dataset because it is compact, fast, and easy to explain.
 
 ## 12. Limitations and Future Work
 

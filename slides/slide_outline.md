@@ -100,7 +100,7 @@ Show one of:
 - training curves from `outputs/training_curves.png`
 - confusion matrix from `outputs/confusion_matrix.png`
 - misclassified examples from `outputs/misclassified_examples.png`
-- ResNet-18 baseline command and architecture comparison
+- ResNet-18 baseline comparison: 99.18% test accuracy, but 11.17M parameters and 726.28 s CPU training time
 
 ## 13. Conclusion
 

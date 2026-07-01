@@ -144,6 +144,21 @@ python evaluate.py --model resnet18 --checkpoint checkpoints/resnet18_mnist_best
 
 This adapts ResNet-18 to one-channel 28x28 MNIST images by replacing the first convolution and removing the initial max-pooling layer.
 
+Final ResNet-18 baseline run:
+
+| Metric | LeNet-5 | ResNet-18 |
+|---|---:|---:|
+| Parameters | 61,706 | 11,172,810 |
+| Epochs | 8 | 5 |
+| Device used | CPU | CPU |
+| Training time | 16.81 s | 726.28 s |
+| Best validation accuracy | 98.68% | 98.88% |
+| Test accuracy | 98.83% | 99.18% |
+| Test error | 1.17% | 0.82% |
+| Checkpoint size | 0.25 MB | 44.77 MB |
+
+The modern ResNet-18 baseline is more accurate by 0.35 percentage points, but it uses about 181x more trainable parameters and took about 43x longer in our CPU run.
+
 ## Make report figures
 
 After training and evaluation:
