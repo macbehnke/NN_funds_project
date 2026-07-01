@@ -1,0 +1,110 @@
+# Slide Outline: LeNet-5 on MNIST
+
+## 1. Title
+
+LeNet-5 on MNIST: Reproducing a Classic CNN Baseline
+
+Names, course, date.
+
+## 2. Problem
+
+- Input: 28x28 handwritten digit image
+- Output: digit class 0-9
+- Goal: train a small CNN that is accurate, reproducible, and easy to demo
+
+## 3. Why This Project
+
+- Classic neural network benchmark
+- Direct connection to CNN chapters
+- Small enough to train under the course constraints
+- Easy for non-specialists to understand
+
+## 4. Dataset
+
+- MNIST
+- 60k train, 10k test
+- 5k validation split from training data
+- Show several example digits
+
+## 5. Model Architecture
+
+Show the pipeline:
+
+```text
+image -> conv -> tanh -> avg pool -> conv -> tanh -> avg pool -> FC -> FC -> prediction
+```
+
+Mention parameter count from final run.
+
+## 6. Training Setup
+
+- Adam optimizer
+- cross-entropy loss
+- batch size 128
+- 8 epochs
+- fixed random seed
+- best checkpoint selected by validation accuracy
+
+## 7. Results
+
+Add final metrics:
+
+- validation accuracy
+- test accuracy
+- training time
+- confusion matrix summary
+
+## 8. Error Analysis
+
+Show 3-5 mistakes:
+
+- true label
+- predicted label
+- confidence
+- short explanation
+
+## 9. Demo
+
+Run:
+
+```bash
+python demo.py --sample-index 7
+```
+
+Show the saved prediction image or run it live.
+
+## 10. What Worked
+
+- Small CNN is enough for MNIST
+- Convolutions learn useful stroke features
+- Validation checkpointing was simple and reliable
+
+## 11. What Did Not Work / Limitations
+
+- MNIST is clean and centered
+- Real photos need better preprocessing
+- Accuracy alone does not prove robustness
+
+## 12. Optional Wow Slide
+
+Ideas if there is time:
+
+- Compare with team handwritten digits
+- Show a custom image demo
+- Add FGSM adversarial examples
+- Compare `tanh` vs `ReLU`
+
+## 13. Conclusion
+
+- Reproduced a classic CNN baseline
+- Built clean train/evaluate/demo pipeline
+- Reached expected high accuracy with a small model
+
+## 14. Q&A
+
+Backup details:
+
+- exact architecture
+- confusion matrix
+- training curve
+- reproducibility settings
