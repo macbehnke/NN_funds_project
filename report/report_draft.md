@@ -124,7 +124,7 @@ The generated figure `outputs/misclassified_examples.png` should be included in 
 
 ## 8. Demo
 
-The demo script loads the saved checkpoint and predicts either:
+The project has two demos. The command-line demo loads the saved checkpoint and predicts either:
 
 - a selected MNIST test example, or
 - a user-provided image file
@@ -136,6 +136,14 @@ python demo.py --sample-index 7
 ```
 
 This produces `outputs/demo_prediction.png`, which can be used in the presentation.
+
+The stronger presentation demo is the local browser app:
+
+```bash
+python app.py
+```
+
+The app opens at `http://127.0.0.1:5000`. A user draws a digit in the browser canvas, clicks `Classify`, and sees the predicted digit with probability bars. This is the main wow component because it turns the trained model into an interactive artifact a non-specialist can try.
 
 ## 9. Lessons Learned
 
@@ -205,6 +213,7 @@ Possible extensions:
 - compare average pooling with max pooling;
 - add an adversarial example demo using FGSM;
 - build a small Streamlit or browser demo.
+- improve the browser preprocessing to handle dark strokes on white paper photos.
 
 ## 13. References
 

@@ -75,10 +75,10 @@ Show 3-5 mistakes:
 Run:
 
 ```bash
-python demo.py --sample-index 7
+python app.py
 ```
 
-Show the saved prediction image or run it live.
+Open `http://127.0.0.1:5000`, draw a digit, and classify it live. Keep `python demo.py --sample-index 7` as the backup if the browser demo is not available.
 
 ## 10. What Worked
 
@@ -96,6 +96,7 @@ Show the saved prediction image or run it live.
 
 Show one of:
 
+- live browser drawing demo from `app.py`
 - training curves from `outputs/training_curves.png`
 - confusion matrix from `outputs/confusion_matrix.png`
 - misclassified examples from `outputs/misclassified_examples.png`

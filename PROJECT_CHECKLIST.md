@@ -7,6 +7,7 @@ Use this before submitting.
 - [x] `python train.py` runs from a clean environment.
 - [x] `python evaluate.py --checkpoint checkpoints/lenet5_mnist_best.pt` runs.
 - [x] `python demo.py --sample-index 7` runs.
+- [x] `python app.py` runs and the browser drawing demo classifies a digit.
 - [x] `outputs/metrics.json` contains the final reported metrics.
 - [x] `outputs/evaluation.json` contains confusion matrix and class metrics.
 - [x] Final checkpoint is under 100 MB.
@@ -24,6 +25,7 @@ Use this before submitting.
 - [x] Add final accuracy and runtime.
 - [x] Add architecture diagram.
 - [x] Add demo screenshot.
+- [x] Demonstrate the browser drawing app live or record it as a fallback.
 - [x] Add 3-5 error examples.
 - [ ] Rehearse 10-minute talk.
 

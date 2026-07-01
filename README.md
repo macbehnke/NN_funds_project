@@ -60,6 +60,7 @@ The training script splits the 60,000 training images into:
 ├── train.py
 ├── evaluate.py
 ├── demo.py
+├── app.py
 ├── requirements.txt
 ├── src/
 │   ├── data.py
@@ -177,6 +178,22 @@ The demo saves a visualization to:
 outputs/demo_prediction.png
 ```
 
+## Browser drawing demo
+
+Run the local web app:
+
+```bash
+python app.py
+```
+
+Open:
+
+```text
+http://127.0.0.1:5000
+```
+
+Draw a digit in the browser and click `Classify`. The app sends the canvas image to the trained LeNet-5 checkpoint, preprocesses it into MNIST format, and returns the predicted digit plus class probabilities.
+
 ## Reproduce final result
 
 The committed final run produced `outputs/metrics.json`, `outputs/evaluation.json`, figures in `outputs/`, and `checkpoints/lenet5_mnist_best.pt`. Re-running training should normally produce a result around 98-99% test accuracy, though exact values can differ slightly by environment.
@@ -201,4 +218,5 @@ This project mainly connects to:
 
 - MNIST is clean and much easier than real handwriting from phones or scanned documents.
 - The demo image preprocessing is simple and may fail on unusual backgrounds or off-center digits.
+- The browser drawing demo works best with MNIST-style white strokes on a black background.
 - The model is intentionally small and classical; it is not meant to be state of the art.

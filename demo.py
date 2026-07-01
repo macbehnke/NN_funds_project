@@ -3,27 +3,18 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import torch
-from PIL import Image, ImageOps
+import matplotlib.pyplot as plt
 from torchvision import datasets, transforms
 
 from src.data import MNIST_MEAN, MNIST_STD
 from src.model import LeNet5
+from src.preprocess import preprocess_user_file
 from src.utils import get_device
 
 
 def preprocess_user_image(path: Path) -> torch.Tensor:
-    image = Image.open(path).convert("L")
-    image = ImageOps.invert(image)
-    image = ImageOps.fit(image, (28, 28))
-    transform = transforms.Compose(
-        [
-            transforms.ToTensor(),
-            transforms.Normalize(MNIST_MEAN, MNIST_STD),
-        ]
-    )
-    return transform(image).unsqueeze(0)
+    return preprocess_user_file(path)
 
 
 def parse_args() -> argparse.Namespace:
