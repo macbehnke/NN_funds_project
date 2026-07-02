@@ -63,12 +63,12 @@ Compare to LeNet-5 paper:
 
 ## 8. Error Analysis
 
-Show 3-5 mistakes:
+Show the committed `outputs/misclassified_examples.png` figure:
 
 - true label
 - predicted label
 - confidence
-- short explanation
+- short explanation that the failures are visually plausible and show the model's limits
 
 ## 9. Demo
 
