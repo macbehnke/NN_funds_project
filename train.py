@@ -76,6 +76,12 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Learning rate. Defaults to 0.01 for SGD and 0.001 for Adam.",
     )
+    parser.add_argument(
+        "--lr-schedule",
+        choices=["constant", "lecun98"],
+        default="constant",
+        help="Learning-rate schedule. lecun98 uses 0.0005/0.0002/0.0001/0.00005/0.00001 by epoch.",
+    )
     parser.add_argument("--val-size", type=int, default=5000, help="Validation examples split from training set.")
     parser.add_argument("--seed", type=int, default=42, help="Random seed.")
     parser.add_argument("--num-workers", type=int, default=0, help="DataLoader worker count. Use 0 on Windows.")
@@ -95,6 +101,31 @@ def default_learning_rate(optimizer_name: str) -> float:
     if optimizer_name == "sgd":
         return 1e-2
     return 1e-3
+
+
+def lecun98_learning_rate(epoch: int) -> float:
+    if epoch <= 2:
+        return 5e-4
+    if epoch <= 5:
+        return 2e-4
+    if epoch <= 8:
+        return 1e-4
+    if epoch <= 12:
+        return 5e-5
+    return 1e-5
+
+
+def learning_rate_for_epoch(schedule_name: str, base_learning_rate: float, epoch: int) -> float:
+    if schedule_name == "constant":
+        return base_learning_rate
+    if schedule_name == "lecun98":
+        return lecun98_learning_rate(epoch)
+    raise ValueError(f"Unknown learning-rate schedule: {schedule_name}")
+
+
+def set_optimizer_learning_rate(optimizer: torch.optim.Optimizer, learning_rate: float) -> None:
+    for group in optimizer.param_groups:
+        group["lr"] = learning_rate
 
 
 def build_optimizer(model: torch.nn.Module, optimizer_name: str, learning_rate: float) -> torch.optim.Optimizer:
@@ -135,8 +166,9 @@ def main() -> None:
     model = build_model(args.model).to(device)
     criterion = build_loss(args.model)
     optimizer_name = resolve_optimizer_name(args.model, args.optimizer)
-    learning_rate = args.lr if args.lr is not None else default_learning_rate(optimizer_name)
-    optimizer = build_optimizer(model, optimizer_name, learning_rate)
+    base_learning_rate = args.lr if args.lr is not None else default_learning_rate(optimizer_name)
+    initial_learning_rate = learning_rate_for_epoch(args.lr_schedule, base_learning_rate, epoch=1)
+    optimizer = build_optimizer(model, optimizer_name, initial_learning_rate)
 
     checkpoint_dir = ensure_dir(args.checkpoint_dir)
     best_checkpoint_path = checkpoint_dir / f"{args.model}_mnist_best.pt"
@@ -147,14 +179,17 @@ def main() -> None:
 
     print(f"Device: {device}")
     print(f"Trainable parameters: {count_parameters(model):,}")
-    print(f"Optimizer: {optimizer_name} lr={learning_rate}")
+    print(f"Optimizer: {optimizer_name} lr={initial_learning_rate} schedule={args.lr_schedule}")
 
     for epoch in range(1, args.epochs + 1):
+        epoch_learning_rate = learning_rate_for_epoch(args.lr_schedule, base_learning_rate, epoch)
+        set_optimizer_learning_rate(optimizer, epoch_learning_rate)
         train_loss, train_accuracy = run_epoch(model, args.model, train_loader, criterion, device, optimizer)
         val_loss, val_accuracy = run_epoch(model, args.model, val_loader, criterion, device)
 
         row = {
             "epoch": epoch,
+            "learning_rate": epoch_learning_rate,
             "train_loss": train_loss,
             "train_accuracy": train_accuracy,
             "val_loss": val_loss,
@@ -164,6 +199,7 @@ def main() -> None:
 
         print(
             f"Epoch {epoch:02d}/{args.epochs} "
+            f"lr={epoch_learning_rate:.6g} "
             f"train_loss={train_loss:.4f} train_acc={train_accuracy:.4f} "
             f"val_loss={val_loss:.4f} val_acc={val_accuracy:.4f}"
         )
@@ -193,7 +229,9 @@ def main() -> None:
         "epochs": args.epochs,
         "batch_size": args.batch_size,
         "optimizer": optimizer_name,
-        "learning_rate": learning_rate,
+        "learning_rate": initial_learning_rate,
+        "base_learning_rate": base_learning_rate,
+        "lr_schedule": args.lr_schedule,
         "parameters": count_parameters(model),
         "best_val_accuracy": best_val_accuracy,
         "test_loss": test_loss,

@@ -143,6 +143,31 @@ python evaluate.py --model lenet5 --checkpoint checkpoints/lenet5_mnist_best.pt 
 
 The original LeNet-5 paper did not use Adam. In this PyTorch reproduction, `--optimizer sgd` is the closer historical choice because it uses plain stochastic gradient descent. The exact 1998 training recipe used older per-parameter/second-order ideas that are not provided as a standard PyTorch optimizer, so this project treats SGD as the historically closer run.
 
+### Optional LeCun 1998 learning-rate schedule experiment
+
+The paper reports a global learning-rate schedule:
+
+| Epochs | Learning rate |
+|---|---:|
+| 1-2 | 0.0005 |
+| 3-5 | 0.0002 |
+| 6-8 | 0.0001 |
+| 9-12 | 0.00005 |
+| 13+ | 0.00001 |
+
+This can be tested separately from the final committed result:
+
+```bash
+bash scripts/run_lecun98_schedule.sh
+```
+
+Or manually:
+
+```bash
+python train.py --model lenet5 --optimizer sgd --lr-schedule lecun98 --epochs 20 --batch-size 128 --num-workers 2 --checkpoint-dir checkpoints/lecun98_schedule --metrics-path outputs/lecun98_schedule_metrics.json
+python evaluate.py --model lenet5 --checkpoint checkpoints/lecun98_schedule/lenet5_mnist_best.pt --num-workers 2 --output outputs/lecun98_schedule_evaluation.json
+```
+
 ## Evaluate
 
 ```bash
