@@ -21,7 +21,7 @@ These choices are the core of the historical architecture and make the model eas
 
 2. Connectivity
 
-   The original second convolution used partial connectivity between feature maps. We used dense convolution, which is the normal PyTorch implementation and is easier to reproduce.
+   The original second convolution used partial connectivity between feature maps. The current implementation reproduces the partial C3 connectivity table instead of using a dense modern convolution.
 
 3. Output layer
 
@@ -29,7 +29,7 @@ These choices are the core of the historical architecture and make the model eas
 
 4. Optimizer
 
-   The completed run used Adam with learning rate 0.001. The original paper did not use Adam, so the code now also supports a stricter `--optimizer sgd` run. Plain SGD is closer to the historical training setup, although it is still not an exact implementation of the paper's older per-parameter/second-order training procedure.
+   The final run used SGD with learning rate 0.01. Plain SGD is closer to the historical training setup than Adam, although it is still not an exact implementation of the paper's older per-parameter/second-order training procedure.
 
 5. Data augmentation
 
@@ -39,12 +39,13 @@ These choices are the core of the historical architecture and make the model eas
 
 The previous LeNet run is superseded by the historical implementation. The final pulled run reports:
 
-- best validation accuracy: 98.64%
-- test accuracy: 98.87%
-- test error: 1.13%
-- training time: 125.94 seconds on CPU
+- optimizer: SGD
+- best validation accuracy: 98.94%
+- test accuracy: 98.93%
+- test error: 1.07%
+- training time: 146.91 seconds on CPU
 
-LeCun et al. report about 0.8-0.95% error for LeNet-5 depending on the run. Our error is within 0.18 percentage points of 0.95%, but not within 0.2 percentage points of 0.8%.
+LeCun et al. report about 0.8-0.95% error for LeNet-5 depending on the run. Our error is within 0.12 percentage points of 0.95%, but not within 0.2 percentage points of 0.8%.
 
 ## Modern baseline
 
@@ -57,7 +58,7 @@ python evaluate.py --model resnet18 --checkpoint checkpoints/resnet18_mnist_best
 
 This represents what we would try today: a deeper residual network with batch normalization. For MNIST, ResNet-18 is probably overpowered, but it is useful for explaining the historical difference between compact early CNNs and modern deep residual architectures.
 
-The ResNet-18 baseline reached 99.18% test accuracy with 11,172,810 parameters and 726.28 seconds of CPU training. Historical LeNet-5 reached 98.87% test accuracy with 60,000 parameters and 125.94 seconds of CPU training.
+The ResNet-18 baseline reached 99.18% test accuracy with 11,172,810 parameters and 726.28 seconds of CPU training. Historical LeNet-5 reached 98.93% test accuracy with 60,000 parameters and 146.91 seconds of CPU training.
 
 ## Historical LeNet-5 experiment
 

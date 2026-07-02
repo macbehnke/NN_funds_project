@@ -38,10 +38,10 @@ Mention parameter count from final run.
 
 ## 6. Training Setup
 
-- Adam optimizer for the completed result; SGD supported for the closer historical rerun
+- SGD optimizer with learning rate 0.01
 - LeNet-5 MAP-style RBF penalty loss
 - batch size 128
-- 8 epochs
+- 20 epochs
 - fixed random seed
 - best checkpoint selected by validation accuracy
 
@@ -50,16 +50,16 @@ Mention parameter count from final run.
 Final metrics:
 
 - parameters: 60,000
-- best validation accuracy: 98.64%
-- test accuracy: 98.87%
-- test error: 1.13%
-- training time: 125.94 seconds on CPU
+- best validation accuracy: 98.94%
+- test accuracy: 98.93%
+- test error: 1.07%
+- training time: 146.91 seconds on CPU
 
 Compare to LeNet-5 paper:
 
-- reported LeNet-5 test error: about 0.8%
-- our gap: 0.37 percentage points
-- honest conclusion: close, but not within 0.2 percentage points
+- reported LeNet-5 test error: about 0.8-0.95%
+- gap to 0.95% result: 0.12 percentage points
+- honest conclusion: within 0.2 points of the 0.95% run, but not of the best 0.8% figure
 
 ## 8. Error Analysis
 
@@ -107,7 +107,7 @@ Show one of:
 - Reproduced a classic CNN baseline
 - Built clean train/evaluate/demo pipeline
 - Historical LeNet-5 has exactly 60,000 trainable parameters
-- Final historical LeNet-5 test accuracy is 98.87%
+- Final historical LeNet-5 test accuracy is 98.93%
 - Explained differences from the 1998 LeNet-5 design
 
 ## 14. Q&A

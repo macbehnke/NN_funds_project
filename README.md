@@ -17,14 +17,15 @@ Historical LeNet-5 final run:
 | Model | Historical LeNet-5 with RBF output |
 | Parameters | 60,000 |
 | Epochs | 20 |
-| Optimizer | Adam |
+| Optimizer | SGD |
+| Learning rate | 0.01 |
 | Device used | CPU |
-| Training time | 125.94 seconds |
-| Best validation accuracy | 98.64% |
-| Test accuracy | 98.87% |
-| Test error | 1.13% |
+| Training time | 146.91 seconds |
+| Best validation accuracy | 98.94% |
+| Test accuracy | 98.93% |
+| Test error | 1.07% |
 
-LeCun et al. reported about 0.8-0.95% test error for LeNet-5 on MNIST depending on the specific run and training setting. Our historical reproduction reaches 1.13% error: within 0.18 percentage points of the 0.95% run, but not within 0.2 percentage points of the best 0.8% figure.
+LeCun et al. reported about 0.8-0.95% test error for LeNet-5 on MNIST depending on the specific run and training setting. Our historical reproduction reaches 1.07% error: within 0.12 percentage points of the 0.95% run, but not within 0.2 percentage points of the best 0.8% figure.
 
 ## Approach
 
@@ -140,7 +141,7 @@ python train.py --model lenet5 --optimizer sgd --lr 0.01 --epochs 20 --batch-siz
 python evaluate.py --model lenet5 --checkpoint checkpoints/lenet5_mnist_best.pt --num-workers 2 --output outputs/evaluation.json
 ```
 
-The original LeNet-5 paper did not use Adam. In this PyTorch reproduction, `--optimizer sgd` is the closer historical choice because it uses plain stochastic gradient descent. The exact 1998 training recipe used older per-parameter/second-order ideas that are not provided as a standard PyTorch optimizer, so this project treats SGD as the historically closer run and Adam as the stable modern optimizer used for the first completed result.
+The original LeNet-5 paper did not use Adam. In this PyTorch reproduction, `--optimizer sgd` is the closer historical choice because it uses plain stochastic gradient descent. The exact 1998 training recipe used older per-parameter/second-order ideas that are not provided as a standard PyTorch optimizer, so this project treats SGD as the historically closer run.
 
 ## Evaluate
 
@@ -172,13 +173,14 @@ Final ResNet-18 baseline run:
 | Parameters | 60,000 | 11,172,810 |
 | Epochs | 20 | 5 |
 | Device used | CPU | CPU |
-| Training time | 125.94 s | 726.28 s |
-| Best validation accuracy | 98.64% | 98.88% |
-| Test accuracy | 98.87% | 99.18% |
-| Test error | 1.13% | 0.82% |
+| Optimizer | SGD | Adam |
+| Training time | 146.91 s | 726.28 s |
+| Best validation accuracy | 98.94% | 98.88% |
+| Test accuracy | 98.93% | 99.18% |
+| Test error | 1.07% | 0.82% |
 | Checkpoint size | 0.26 MB | 44.77 MB |
 
-ResNet-18 is more accurate by 0.31 percentage points, but it uses about 186x more trainable parameters and took about 5.8x longer in our CPU run.
+ResNet-18 is more accurate by 0.25 percentage points, but it uses about 186x more trainable parameters and took about 4.9x longer in our CPU run.
 
 ## Make report figures
 
@@ -232,7 +234,7 @@ Draw a digit in the browser and click `Classify`. The app sends the canvas image
 
 ## Reproduce final result
 
-The committed final run produced `outputs/metrics.json`, `outputs/evaluation.json`, figures in `outputs/`, and `checkpoints/lenet5_mnist_best.pt`. That run used Adam. For the stricter historical optimizer run, use:
+The final historical optimizer run uses:
 
 ```bash
 python train.py --model lenet5 --optimizer sgd --lr 0.01 --epochs 20 --batch-size 128 --num-workers 2
