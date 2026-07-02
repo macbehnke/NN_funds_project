@@ -161,38 +161,7 @@ Important points to discuss:
 - Validation accuracy is useful for checkpoint selection.
 - MNIST performance does not guarantee robustness on real phone photos or unusual handwriting.
 
-## 10. What We Changed and Why
-
-The goal was to reproduce the spirit and main structure of LeNet-5 while keeping the project simple enough for a clean class submission.
-
-What we kept from the 1998 design:
-
-- two convolutional stages;
-- tanh activations;
-- average pooling rather than max pooling;
-- fully connected layers of sizes 120 and 84;
-- a very small parameter count compared with modern CNNs.
-
-What we changed:
-
-- We pad 28x28 MNIST images to 32x32 as in the historical architecture.
-- We reproduce the partial C3 feature-map connectivity.
-- We use fixed Euclidean RBF output units instead of a modern linear classifier.
-- The completed run used SGD instead of Adam, which is closer to the older optimization setup than our first completed run.
-- We did not use distortion-based data augmentation.
-
-Why these changes are reasonable:
-
-- The historical RBF output gives a closer reproduction than the modern softmax classifier.
-- SGD keeps the training setup closer to the historical experiment while preserving the historical architecture and output formulation.
-- Avoiding augmentation keeps the experiment focused on the baseline architecture.
-
-Why these changes matter:
-
-- The exact 1998 per-parameter/second-order optimizer and distortion training are still not reproduced.
-- The 1.07% test error is close to the paper's 0.95% run, but not to the strongest 0.8% figure.
-
-## 11. Modern Baseline: ResNet-18
+## 10. Modern Baseline: ResNet-18
 
 The repository includes a ResNet-18 baseline:
 
@@ -219,24 +188,15 @@ Final comparison:
 
 ResNet-18 improves test accuracy by 0.25 percentage points, but uses about 186 times more trainable parameters and takes about 4.9 times longer in our CPU run. This makes the comparison more interesting than simply saying that the modern model is better: historical LeNet-5 is almost as accurate on MNIST while being much smaller and easier to explain.
 
-## 12. Limitations and Future Work
+## 11. Limitations and Future Work
 
 Limitations:
 
 - The dataset is clean and centered.
 - Custom image preprocessing is simple.
-- The model is not tested on real handwritten samples collected by the team.
 
-Possible extensions:
 
-- collect team handwriting samples and test domain shift;
-- compare `tanh` with `ReLU`;
-- compare average pooling with max pooling;
-- add an adversarial example demo using FGSM;
-- build a small Streamlit or browser demo.
-- improve the browser preprocessing to handle dark strokes on white paper photos.
-
-## 13. References
+## 12. References
 
 - Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner. Gradient-Based Learning Applied to Document Recognition. Proceedings of the IEEE, 1998.
 - MNIST database of handwritten digits.
